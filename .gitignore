@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code / agent tooling
+.claude/
+AGENTS.md
+CLAUDE.md
+
+# working docs / research artifacts (not app source)
+DESIGN.md
+.firecrawl/
