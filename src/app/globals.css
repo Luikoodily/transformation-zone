@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f3eee3;
+  --paper-2: #eae2d0;
+  --ink: #14120d;
+  --ink-soft: #55503f;
+  --accent: #cfe521;
+  --accent-ink: #66730f;
+  --line: #d9cfb8;
+  --dark: #14110c;
+  --dark-line: #3a2f1e;
+  --stone-text: #efe6d2;
+  --logo-gold: #e7a93a;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-line: var(--line);
+  --color-dark: var(--dark);
+  --color-dark-line: var(--dark-line);
+  --color-stone-text: var(--stone-text);
+  --color-logo-gold: var(--logo-gold);
+  --font-display: var(--font-bebas);
+  --font-body: var(--font-manrope);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+#about,
+#programs,
+#results,
+#gym {
+  scroll-margin-top: 96px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
