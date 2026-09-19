@@ -1,9 +1,8 @@
-// Real: name, hours, WhatsApp number. Address/Instagram still DUMMY placeholders — replace before launch.
+// Real: name, address, hours, WhatsApp number. Instagram still a DUMMY placeholder — replace before launch.
 export const location = {
   name: "Transformation Zone Gym",
-  // TODO: confirm real street address
-  address: "[GYM ADDRESS, CITY]",
-  hours: "Mon–Sat · 6AM–10PM",
+  address: "7RVW+72X, 2, Saheed Nagar, Bhubaneswar, Odisha 751007, India",
+  hours: "Mon-Sat · 6AM-10PM · Sun · 5PM-9PM",
   whatsapp: "+91 81390 55920",
   // TODO: confirm real Instagram handle
   instagram: "@transformationzone",
@@ -18,11 +17,19 @@ export function whatsappUrl(message?: string): string {
     : `https://wa.me/${number}`;
 }
 
-export const schedule: { day: string; slots: { time: string; open: boolean }[] }[] = [
-  { day: "MON", slots: [{ time: "6 AM", open: true }, { time: "6 PM", open: false }] },
-  { day: "TUE", slots: [{ time: "6 AM", open: false }, { time: "6 PM", open: true }] },
-  { day: "WED", slots: [{ time: "6 AM", open: true }, { time: "6 PM", open: false }] },
-  { day: "THU", slots: [{ time: "6 AM", open: false }, { time: "6 PM", open: true }] },
-  { day: "FRI", slots: [{ time: "6 AM", open: true }, { time: "6 PM", open: false }] },
-  { day: "SAT", slots: [{ time: "6 AM", open: false }, { time: "6 PM", open: false }] },
+export type DayHours = {
+  day: string;
+  opens: string;
+  closes: string;
+};
+
+// Real weekly hours (source: gym's WhatsApp Business profile).
+export const schedule: DayHours[] = [
+  { day: "MON", opens: "6 AM", closes: "10 PM" },
+  { day: "TUE", opens: "6 AM", closes: "10 PM" },
+  { day: "WED", opens: "6 AM", closes: "10 PM" },
+  { day: "THU", opens: "6 AM", closes: "10 PM" },
+  { day: "FRI", opens: "6 AM", closes: "10 PM" },
+  { day: "SAT", opens: "6 AM", closes: "10 PM" },
+  { day: "SUN", opens: "5 PM", closes: "9 PM" },
 ];
