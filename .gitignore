@@ -47,4 +47,7 @@ CLAUDE.md
 
 # working docs / research artifacts (not app source)
 DESIGN.md
+ARCHITECTURE.md
 .firecrawl/
+
+/src/generated/prisma

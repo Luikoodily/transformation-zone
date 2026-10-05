@@ -1,10 +1,12 @@
 import { coach } from "@/data/coach";
+import { location } from "@/data/location";
 
 const items = [
+  "UNISEX GYM",
   `${coach.yearsExperience}+ YEARS EXPERIENCE`,
   `${coach.clientsTrained} CLIENTS TRAINED`,
   "CERTIFIED COACH",
-  "PERSONALIZED PROGRAMS",
+  location.tagline.toUpperCase(),
 ];
 
 export function TrustStrip() {

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
 
-type Variant = "primary" | "secondary" | "outline-dark";
+type Variant = "primary" | "secondary" | "outline-dark" | "whatsapp";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-accent text-ink",
   secondary: "bg-ink text-paper",
   "outline-dark": "bg-transparent text-stone-text border border-dark-line",
+  whatsapp: "bg-[#25D366] text-white",
 };
 
 export function Button({
@@ -27,17 +29,27 @@ export function Button({
     className
   );
 
+  const content =
+    variant === "whatsapp" ? (
+      <>
+        <WhatsAppIcon className="h-4 w-4" />
+        {children}
+      </>
+    ) : (
+      children
+    );
+
   if (isExternal) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
-        {children}
+        {content}
       </a>
     );
   }
 
   return (
     <Link href={href} className={classes}>
-      {children}
+      {content}
     </Link>
   );
 }

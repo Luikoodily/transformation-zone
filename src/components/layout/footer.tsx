@@ -14,8 +14,7 @@ export function Footer() {
         </span>
       </div>
       <p className="font-body text-[10.5px] text-ink-soft md:text-[11.5px]">
-        © {new Date().getFullYear()} · {location.instagram} · WhatsApp · {location.whatsapp} ·{" "}
-        <em>(dummy data)</em>
+        © {new Date().getFullYear()} · {location.instagram} · WhatsApp · {location.whatsapp}
       </p>
     </footer>
   );

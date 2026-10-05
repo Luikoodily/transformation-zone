@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Member {
+  id           String       @id @default(cuid())
+  name         String
+  phone        String
+  plan         String
+  // Total fee for the plan, in whole rupees. What has been paid lives in `payments`.
+  planPrice    Int
+  startDate    DateTime
+  endDate      DateTime
+  // When the remaining balance is expected (only meaningful while a balance is due).
+  balanceDueBy DateTime?
+  status       MemberStatus @default(ACTIVE)
+  notes        String?
+  payments     Payment[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+enum MemberStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+// Ledger of money received. An "advance" is simply a payment smaller than the
+// plan price; the balance is planPrice minus the sum of payments.
+model Payment {
+  id        String        @id @default(cuid())
+  memberId  String
+  member    Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  amount    Int
+  paidAt    DateTime
+  method    PaymentMethod @default(CASH)
+  note      String?
+  createdAt DateTime      @default(now())
+
+  @@index([memberId])
+  @@index([paidAt])
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+  BANK_TRANSFER
+  OTHER
+}
+
+model Staff {
+  id       String   @id @default(cuid())
+  name     String
+  role     String
+  phone    String
+  active   Boolean  @default(true)
+  joinedAt DateTime @default(now())
+}

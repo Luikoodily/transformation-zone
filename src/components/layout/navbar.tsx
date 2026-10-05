@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { motion } from "motion/react";
@@ -21,6 +21,24 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const activeId = useActiveSection(links.map((l) => l.id));
   const scrolled = useScrolled();
+  const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    document.body.style.overflow = "hidden";
+    firstMobileLinkRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-30">
@@ -46,7 +64,7 @@ export function Navbar() {
                 key={l.href}
                 href={l.href}
                 aria-current={isActive ? "true" : undefined}
-                className="relative py-1 font-body text-[12.5px] font-bold text-ink hover:text-accent-ink"
+                className="relative rounded py-1 font-body text-[12.5px] font-bold text-ink hover:text-accent-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
               >
                 {l.label}
                 {isActive && (
@@ -76,23 +94,24 @@ export function Navbar() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-ink text-ink"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-ink text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
       {open && (
         <nav aria-label="Primary" className="flex flex-col gap-1 bg-paper px-5 pb-4 md:hidden">
-          {links.map((l) => {
+          {links.map((l, i) => {
             const isActive = activeId === l.id;
             return (
               <Link
                 key={l.href}
+                ref={i === 0 ? firstMobileLinkRef : undefined}
                 href={l.href}
                 onClick={() => setOpen(false)}
                 aria-current={isActive ? "true" : undefined}
                 className={cn(
-                  "border-t border-line py-3 font-body text-sm font-bold",
+                  "border-t border-line py-3 font-body text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
                   isActive ? "text-accent-ink" : "text-ink"
                 )}
               >

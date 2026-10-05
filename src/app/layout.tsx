@@ -52,6 +52,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${bebas.variable} ${manrope.variable} antialiased`}>
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <MotionConfig reducedMotion="user">{children}</MotionConfig>
       </body>
     </html>

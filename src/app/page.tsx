@@ -7,9 +7,12 @@ import { Coach } from "@/components/sections/coach";
 import { Method } from "@/components/sections/method";
 import { Programs } from "@/components/sections/programs";
 import { Schedule } from "@/components/sections/schedule";
+import { Classes } from "@/components/sections/classes";
 import { Results } from "@/components/sections/results";
 import { Gym } from "@/components/sections/gym";
 import { Credentials } from "@/components/sections/credentials";
+import { Membership } from "@/components/sections/membership";
+import { Community } from "@/components/sections/community";
 import { Testimonial } from "@/components/sections/testimonial";
 import { Location } from "@/components/sections/location";
 import { FinalCTA } from "@/components/sections/final-cta";
@@ -21,7 +24,7 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     name: location.name,
-    // TODO: replace with real address/geo before launch
+    slogan: location.tagline,
     address: location.address,
     openingHours: location.hours,
     employee: {
@@ -39,16 +42,19 @@ export default function Home() {
       />
       <div className="relative pb-20 md:pb-0">
         <Navbar />
-        <main>
+        <main id="main-content" tabIndex={-1} className="focus:outline-none">
           <Hero />
           <TrustStrip />
           <Coach />
           <Method />
           <Programs />
           <Schedule />
+          <Classes />
           <Results />
           <Gym />
           <Credentials />
+          <Membership />
+          <Community />
           <Testimonial />
           <Location />
           <FinalCTA />

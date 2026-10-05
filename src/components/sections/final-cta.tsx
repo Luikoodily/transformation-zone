@@ -20,7 +20,7 @@ export function FinalCTA() {
         <Button href={whatsappUrl("Hi, I'd like to book a consultation.")}>
           Book a Consultation
         </Button>
-        <Button href={whatsappUrl()} variant="outline-dark">
+        <Button href={whatsappUrl()} variant="whatsapp">
           WhatsApp
         </Button>
       </div>

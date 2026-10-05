@@ -17,7 +17,7 @@ export function Location() {
         </div>
         <div className="flex flex-col gap-2.5 md:flex-row md:gap-3.5">
           <Button href={location.directionsUrl}>Get Directions</Button>
-          <Button href={whatsappUrl()} variant="outline-dark">
+          <Button href={whatsappUrl()} variant="whatsapp">
             WhatsApp
           </Button>
         </div>

@@ -1,12 +1,15 @@
-// Real: name, address, hours, WhatsApp number. Instagram still a DUMMY placeholder — replace before launch.
+// Real: name, tagline, address, hours, WhatsApp number, Instagram — sourced from
+// the gym's own flyers and WhatsApp Business profile.
 export const location = {
   name: "Transformation Zone Gym",
-  address: "7RVW+72X, 2, Saheed Nagar, Bhubaneswar, Odisha 751007, India",
+  tagline: "Break out of your limits",
+  address: "Plot No. 1391, Eldeco Udyan-II, Sharda Nagar, Shaheed Path, Lucknow",
   hours: "Mon-Sat · 6AM-10PM · Sun · 5PM-9PM",
-  whatsapp: "+91 81390 55920",
-  // TODO: confirm real Instagram handle
-  instagram: "@transformationzone",
-  directionsUrl: "#", // TODO: real Google Maps link
+  whatsapp: "+91 89603 57693",
+  instagram: "@transformationzoneindia",
+  directionsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    "Plot No. 1391, Eldeco Udyan-II, Sharda Nagar, Shaheed Path, Lucknow"
+  )}`,
 };
 
 /** Builds a wa.me deep link with an optional prefilled message. */

@@ -7,11 +7,7 @@ export function MobileFixedCta() {
       <Button href={whatsappUrl("Hi, I'd like to book a consultation.")} className="flex-1">
         Book
       </Button>
-      <Button
-        href={whatsappUrl()}
-        variant="outline-dark"
-        className="flex-1 !border-ink !text-ink"
-      >
+      <Button href={whatsappUrl()} variant="whatsapp" className="flex-1">
         WhatsApp
       </Button>
     </div>
