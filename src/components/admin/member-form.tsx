@@ -17,13 +17,18 @@ import {
 import { Textarea } from "@/components/admin/ui/textarea";
 import { DatePicker } from "@/components/admin/date-picker";
 import { FormField, RupeeInput } from "@/components/admin/form-field";
-import { membershipPlans, planLabel } from "@/data/membership";
 import type { ActionResult } from "@/lib/action-result";
 import { addMonthsToDateInput } from "@/lib/dates";
 import { formatINR } from "@/lib/format";
 import { PAYMENT_METHODS, type PaymentMethodValue } from "@/lib/members";
 
 const CUSTOM_PLAN = "custom";
+
+export type PlanOption = { id: string; title: string; amount: number; months: number; note: string | null };
+
+function planLabel(plan: PlanOption): string {
+  return plan.note ? `${plan.title} (${plan.note})` : plan.title;
+}
 
 export type MemberFormValues = {
   name: string;
@@ -44,13 +49,14 @@ function toNumber(value: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-function presetIndexFor(plan: string): number {
-  return membershipPlans.findIndex((p) => planLabel(p) === plan);
+function presetIndexFor(plans: PlanOption[], plan: string): number {
+  return plans.findIndex((p) => planLabel(p) === plan);
 }
 
 export function MemberForm({
   mode,
   today,
+  plans,
   defaults,
   onSubmit,
   cancelHref,
@@ -58,6 +64,7 @@ export function MemberForm({
   mode: "create" | "edit";
   /** Gym-local "yyyy-MM-dd" for today, used for default dates. */
   today: string;
+  plans: PlanOption[];
   defaults?: Partial<MemberFormValues>;
   onSubmit: (values: MemberFormValues) => Promise<ActionResult>;
   cancelHref: string;
@@ -77,7 +84,7 @@ export function MemberForm({
     ...defaults,
   });
   const [planChoice, setPlanChoice] = React.useState<string>(() => {
-    const index = presetIndexFor(defaults?.plan ?? "");
+    const index = presetIndexFor(plans, defaults?.plan ?? "");
     if (index >= 0) return String(index);
     return defaults?.plan ? CUSTOM_PLAN : "";
   });
@@ -93,10 +100,10 @@ export function MemberForm({
   function choosePlan(choice: string) {
     setPlanChoice(choice);
     if (choice === CUSTOM_PLAN) {
-      setValues((current) => ({ ...current, plan: presetIndexFor(current.plan) >= 0 ? "" : current.plan }));
+      setValues((current) => ({ ...current, plan: presetIndexFor(plans, current.plan) >= 0 ? "" : current.plan }));
       return;
     }
-    const preset = membershipPlans[Number(choice)];
+    const preset = plans[Number(choice)];
     if (!preset) return;
     setValues((current) => ({
       ...current,
@@ -110,7 +117,7 @@ export function MemberForm({
 
   function changeStartDate(startDate: string) {
     setValues((current) => {
-      const preset = planChoice !== CUSTOM_PLAN ? membershipPlans[Number(planChoice)] : undefined;
+      const preset = planChoice !== CUSTOM_PLAN ? plans[Number(planChoice)] : undefined;
       const endDate =
         !endDateTouched.current && preset
           ? addMonthsToDateInput(startDate, preset.months)
@@ -195,8 +202,8 @@ export function MemberForm({
                 <SelectValue placeholder="Choose a plan" />
               </SelectTrigger>
               <SelectContent>
-                {membershipPlans.map((plan, index) => (
-                  <SelectItem key={planLabel(plan)} value={String(index)}>
+                {plans.map((plan, index) => (
+                  <SelectItem key={plan.id} value={String(index)}>
                     {planLabel(plan)} — {formatINR(plan.amount)}
                   </SelectItem>
                 ))}

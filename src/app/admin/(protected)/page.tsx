@@ -17,7 +17,8 @@ import { addMonths, daysBetween, formatDate, todayUTC } from "@/lib/dates";
 import { formatINR } from "@/lib/format";
 import { matchesFilter, paymentMethodLabel, summarizeMember } from "@/lib/members";
 import { prisma } from "@/lib/prisma";
-import { dueReminderLink } from "@/lib/whatsapp";
+import { BackupStatus } from "@/components/admin/data-tools";
+import { dueReminderLink, renewalReminderLink } from "@/lib/whatsapp";
 
 function relativeDays(daysLeft: number): string {
   if (daysLeft === 0) return "today";
@@ -76,6 +77,8 @@ export default async function AdminHome() {
           </Button>
         }
       />
+
+      <BackupStatus />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard label="Active members" value={activeCount} icon={UsersIcon} hint="Membership running today" />
@@ -181,8 +184,19 @@ export default async function AdminHome() {
                       <Link href={`/admin/members/${member.id}`} className="min-w-0 truncate font-medium hover:underline">
                         {member.name}
                       </Link>
-                      <span className="shrink-0 text-xs text-muted-foreground">
+                      <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
                         {formatDate(member.endDate)} · {relativeDays(summary.daysLeft)}
+                        <Button asChild size="icon-xs" variant="outline">
+                          <a
+                            href={renewalReminderLink({ name: member.name, phone: member.phone, plan: member.plan, endDate: member.endDate })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Send renewal reminder to ${member.name}`}
+                            title="Send renewal reminder on WhatsApp"
+                          >
+                            <MessageCircleIcon />
+                          </a>
+                        </Button>
                       </span>
                     </li>
                   ))}

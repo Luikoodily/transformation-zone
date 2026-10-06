@@ -4,9 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  DatabaseIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  MegaphoneIcon,
   MenuIcon,
+  TagIcon,
   UserCogIcon,
   UsersIcon,
   WalletIcon,
@@ -29,6 +32,9 @@ const NAV = [
   { href: "/admin/members", label: "Members", icon: UsersIcon, exact: false },
   { href: "/admin/payments", label: "Payments", icon: WalletIcon, exact: false },
   { href: "/admin/staff", label: "Staff", icon: UserCogIcon, exact: false },
+  { href: "/admin/announcements", label: "Website posts", icon: MegaphoneIcon, exact: false },
+  { href: "/admin/plans", label: "Membership plans", icon: TagIcon, exact: false },
+  { href: "/admin/data", label: "Data & backup", icon: DatabaseIcon, exact: false },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {

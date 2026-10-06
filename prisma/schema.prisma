@@ -73,3 +73,41 @@ model Staff {
   active   Boolean  @default(true)
   joinedAt DateTime @default(now())
 }
+
+// Posts the admin publishes to the public website: holiday closures, events,
+// notices and Instagram posts.
+model Announcement {
+  id        String           @id @default(cuid())
+  kind      AnnouncementKind @default(NOTICE)
+  title     String
+  body      String?
+  startsOn  DateTime
+  endsOn    DateTime?
+  link      String?
+  imageUrl  String?
+  imageData Bytes?
+  imageMime String?
+  published Boolean          @default(true)
+  createdAt DateTime         @default(now())
+
+  @@index([startsOn])
+}
+
+enum AnnouncementKind {
+  HOLIDAY
+  EVENT
+  NOTICE
+  INSTAGRAM
+}
+
+model MembershipPlan {
+  id        String   @id @default(cuid())
+  title     String
+  amount    Int
+  months    Int
+  note      String?
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

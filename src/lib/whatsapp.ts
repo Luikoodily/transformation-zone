@@ -25,3 +25,15 @@ export function dueReminderLink(member: {
     `Hi ${member.name}, a gentle reminder from ${location.name}: ${formatINR(member.balance)} is pending for your ${member.plan} membership${dueBy}. Thank you!`
   );
 }
+
+export function renewalReminderLink(member: {
+  name: string;
+  phone: string;
+  plan: string;
+  endDate: Date;
+}): string {
+  return whatsappLinkTo(
+    member.phone,
+    `Hi ${member.name}, your ${member.plan} membership at ${location.name} ends on ${formatDate(member.endDate)}. Reply here to renew and keep your streak going!`
+  );
+}

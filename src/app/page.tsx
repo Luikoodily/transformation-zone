@@ -11,13 +11,17 @@ import { Classes } from "@/components/sections/classes";
 import { Results } from "@/components/sections/results";
 import { Gym } from "@/components/sections/gym";
 import { Credentials } from "@/components/sections/credentials";
+import { Announcements } from "@/components/sections/announcements";
+import { BmiCalculator } from "@/components/sections/bmi-calculator";
 import { Membership } from "@/components/sections/membership";
-import { Community } from "@/components/sections/community";
+import { InstagramFeed } from "@/components/sections/instagram-feed";
 import { Testimonial } from "@/components/sections/testimonial";
 import { Location } from "@/components/sections/location";
 import { FinalCTA } from "@/components/sections/final-cta";
 import { coach } from "@/data/coach";
 import { location } from "@/data/location";
+
+export const revalidate = 300;
 
 export default function Home() {
   const jsonLd = {
@@ -45,6 +49,7 @@ export default function Home() {
         <main id="main-content" tabIndex={-1} className="focus:outline-none">
           <Hero />
           <TrustStrip />
+          <Announcements />
           <Coach />
           <Method />
           <Programs />
@@ -53,8 +58,9 @@ export default function Home() {
           <Results />
           <Gym />
           <Credentials />
+          <BmiCalculator />
           <Membership />
-          <Community />
+          <InstagramFeed />
           <Testimonial />
           <Location />
           <FinalCTA />

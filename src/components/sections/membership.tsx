@@ -1,9 +1,22 @@
 import { SectionLabel } from "@/components/ui/section-label";
 import { Button } from "@/components/ui/button";
-import { membershipPlans, membershipServicesNote, planPriceLabel } from "@/data/membership";
+import { membershipServicesNote } from "@/data/membership";
 import { whatsappUrl } from "@/data/location";
+import { formatINR } from "@/lib/format";
+import { prisma } from "@/lib/prisma";
 
-export function Membership() {
+async function loadPlans() {
+  try {
+    return await prisma.membershipPlan.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } });
+  } catch {
+    return [];
+  }
+}
+
+export async function Membership() {
+  const plans = await loadPlans();
+  if (plans.length === 0) return null;
+
   return (
     <section id="membership" className="bg-dark px-6 py-16 md:px-14 md:py-[120px]">
       <SectionLabel onDark className="mb-2">
@@ -14,9 +27,9 @@ export function Membership() {
       </h2>
 
       <div className="grid gap-4 md:grid-cols-2 md:gap-5">
-        {membershipPlans.map((plan) => (
+        {plans.map((plan) => (
           <div
-            key={plan.title}
+            key={plan.id}
             className="flex items-center justify-between gap-4 border border-dark-line p-6 md:p-8"
           >
             <div>
@@ -28,7 +41,7 @@ export function Membership() {
               )}
             </div>
             <p className="font-display text-2xl whitespace-nowrap text-accent md:text-4xl">
-              {planPriceLabel(plan)}
+              {formatINR(plan.amount)}
             </p>
           </div>
         ))}

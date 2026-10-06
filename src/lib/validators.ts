@@ -94,3 +94,36 @@ export type MemberUpdateInput = z.input<typeof memberUpdateSchema>;
 export type MemberCreateInput = z.input<typeof memberCreateSchema>;
 export type PaymentInput = z.input<typeof paymentSchema>;
 export type StaffInput = z.input<typeof staffSchema>;
+
+const optionalUrl = z.union([
+  z.literal(""),
+  z.url({ protocol: /^https?$/, error: "Enter a full link starting with https://" }),
+]);
+
+export const announcementSchema = z
+  .object({
+    kind: z.enum(["HOLIDAY", "EVENT", "NOTICE", "INSTAGRAM"], { error: "Choose a type" }),
+    title: z.string().trim().min(1, { error: "Title is required" }).max(100, { error: "Title is too long" }),
+    body: z.string().trim().max(600, { error: "Details are too long" }),
+    startsOn: dateInput,
+    endsOn: optionalDateInput,
+    link: optionalUrl,
+    imageUrl: optionalUrl,
+    published: z.boolean(),
+  })
+  .refine((v) => v.endsOn === "" || v.endsOn >= v.startsOn, {
+    path: ["endsOn"],
+    error: "End date must be on or after the start date",
+  });
+
+export type AnnouncementInput = z.input<typeof announcementSchema>;
+
+export const planSchema = z.object({
+  title: z.string().trim().min(1, { error: "Title is required" }).max(100, { error: "Title is too long" }),
+  amount: rupees("Price"),
+  months: z.coerce.number().int().min(1, { error: "Months must be at least 1" }).max(60, { error: "Months is too large" }),
+  note: z.string().trim().max(40, { error: "Note is too long" }),
+  active: z.boolean(),
+});
+
+export type PlanInput = z.input<typeof planSchema>;

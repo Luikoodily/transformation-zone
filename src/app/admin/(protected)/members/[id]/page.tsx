@@ -6,6 +6,7 @@ import { MemberForm } from "@/components/admin/member-form";
 import { MemberStatusActions } from "@/components/admin/member-status-actions";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
 import { RecordPaymentForm } from "@/components/admin/record-payment-form";
+import { ReceiptButton } from "@/components/admin/receipt-button";
 import { OverdueBadge, PaymentBadge, StatusBadge } from "@/components/admin/status-badges";
 import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/admin/ui/card";
@@ -20,6 +21,7 @@ import {
   TableRow,
 } from "@/components/admin/ui/table";
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
+import { location } from "@/data/location";
 import { formatDate, toDateInput, todayUTC } from "@/lib/dates";
 import { formatINR } from "@/lib/format";
 import { paymentMethodLabel, summarizeMember } from "@/lib/members";
@@ -62,10 +64,13 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
 
 export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const member = await prisma.member.findUnique({
-    where: { id },
-    include: { payments: { orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }] } },
-  });
+  const [member, plans] = await Promise.all([
+    prisma.member.findUnique({
+      where: { id },
+      include: { payments: { orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }] } },
+    }),
+    prisma.membershipPlan.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
+  ]);
   if (!member) notFound();
 
   const today = todayUTC();
@@ -173,7 +178,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
                         <TableHead>Method</TableHead>
                         <TableHead>Note</TableHead>
                         <TableHead className="text-right">Amount</TableHead>
-                        <TableHead className="w-10 pr-3" />
+                        <TableHead className="w-20 pr-3" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -186,17 +191,38 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
                           </TableCell>
                           <TableCell className="text-right font-medium">{formatINR(payment.amount)}</TableCell>
                           <TableCell className="pr-3">
-                            <ConfirmActionButton
-                              trigger={
-                                <Button variant="ghost" size="icon-sm" aria-label="Delete payment">
-                                  <Trash2Icon />
-                                </Button>
-                              }
-                              title="Delete this payment?"
-                              description={`Removes the ${formatINR(payment.amount)} payment from ${formatDate(payment.paidAt)}. The balance due will go back up by that amount.`}
-                              confirmLabel="Delete payment"
-                              action={deletePayment.bind(null, payment.id)}
-                            />
+                            <div className="flex items-center justify-end gap-1">
+                              <ReceiptButton
+                                memberPhone={member.phone}
+                                data={{
+                                  gymName: location.name,
+                                  gymAddress: location.address,
+                                  gymPhone: location.whatsapp,
+                                  receiptNo: payment.id.slice(-8).toUpperCase(),
+                                  memberName: member.name,
+                                  memberPhone: member.phone,
+                                  plan: member.plan,
+                                  amount: formatINR(payment.amount),
+                                  paidOn: formatDate(payment.paidAt),
+                                  method: paymentMethodLabel(payment.method),
+                                  note: payment.note,
+                                  totalPaid: formatINR(summary.paid),
+                                  planPrice: formatINR(member.planPrice),
+                                  balance: formatINR(summary.balance),
+                                }}
+                              />
+                              <ConfirmActionButton
+                                trigger={
+                                  <Button variant="ghost" size="icon-sm" aria-label="Delete payment">
+                                    <Trash2Icon />
+                                  </Button>
+                                }
+                                title="Delete this payment?"
+                                description={`Removes the ${formatINR(payment.amount)} payment from ${formatDate(payment.paidAt)}. The balance due will go back up by that amount.`}
+                                confirmLabel="Delete payment"
+                                action={deletePayment.bind(null, payment.id)}
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -280,6 +306,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         <MemberForm
           mode="edit"
           today={todayInput}
+          plans={plans}
           defaults={{
             name: member.name,
             phone: member.phone,

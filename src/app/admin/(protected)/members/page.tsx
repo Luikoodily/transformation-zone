@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Form from "next/form";
-import { ChevronRightIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, SearchIcon, XIcon } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
 import { OverdueBadge, PaymentBadge, StatusBadge } from "@/components/admin/status-badges";
 import { Button, buttonVariants } from "@/components/admin/ui/button";
@@ -37,12 +37,14 @@ function expiryHint(summary: MemberSummary): string {
   return `in ${summary.daysLeft} day${summary.daysLeft === 1 ? "" : "s"}`;
 }
 
+const PAGE_SIZE = 25;
+
 export default async function MembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; filter?: string }>;
+  searchParams: Promise<{ q?: string; filter?: string; page?: string }>;
 }) {
-  const { q = "", filter: rawFilter } = await searchParams;
+  const { q = "", filter: rawFilter, page: rawPage } = await searchParams;
   const filter = parseMemberFilter(rawFilter);
   const query = q.trim();
   const today = todayUTC();
@@ -61,17 +63,33 @@ export default async function MembersPage({
   });
 
   const rows = members.map((member) => ({ member, summary: summarizeMember(member, today) }));
-  const visible = rows.filter((r) => matchesFilter(r.summary, filter));
+  const matching = rows.filter((r) => matchesFilter(r.summary, filter));
   const countFor = (value: (typeof MEMBER_FILTERS)[number]["value"]) =>
     rows.filter((r) => matchesFilter(r.summary, value)).length;
 
-  const filterHref = (value: string) => {
+  const pageCount = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
+  const page = Math.min(Math.max(1, Number(rawPage) || 1), pageCount);
+  const visible = matching.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const pageHref = (targetPage: number) => {
     const params = new URLSearchParams();
-    if (value !== "all") params.set("filter", value);
+    if (filter !== "all") params.set("filter", filter);
+    if (query) params.set("q", query);
+    if (targetPage > 1) params.set("page", String(targetPage));
+    const qs = params.toString();
+    return qs ? `/admin/members?${qs}` : "/admin/members";
+  };
+  const filterHref = (value: string) => {
+    // "All" means show everyone — drop the search too, otherwise it looks
+    // broken (filter clears but the leftover query keeps the list narrowed).
+    if (value === "all") return "/admin/members";
+    const params = new URLSearchParams();
+    params.set("filter", value);
     if (query) params.set("q", query);
     const qs = params.toString();
     return qs ? `/admin/members?${qs}` : "/admin/members";
   };
+  const clearSearchHref = filter === "all" ? "/admin/members" : `/admin/members?filter=${filter}`;
 
   return (
     <div className="grid gap-6">
@@ -98,8 +116,17 @@ export default async function MembersPage({
               defaultValue={query}
               placeholder="Search by name or phone"
               aria-label="Search members"
-              className="bg-card pl-9"
+              className={cn("bg-card pl-9", query && "pr-9")}
             />
+            {query && (
+              <Link
+                href={clearSearchHref}
+                aria-label="Clear search"
+                className="absolute top-1/2 right-2.5 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <XIcon className="size-4" />
+              </Link>
+            )}
           </div>
           <Button type="submit" variant="outline">
             Search
@@ -152,10 +179,10 @@ export default async function MembersPage({
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-muted/50">
                   <TableHead className="pl-4">Member</TableHead>
-                  <TableHead>Plan</TableHead>
+                  <TableHead className="hidden md:table-cell">Plan</TableHead>
                   <TableHead>Payment</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden sm:table-cell">Expires</TableHead>
+                  <TableHead className="hidden sm:table-cell">Status</TableHead>
                   <TableHead className="w-10 pr-4" />
                 </TableRow>
               </TableHeader>
@@ -168,7 +195,7 @@ export default async function MembersPage({
                       </Link>
                       <div className="text-xs text-muted-foreground">{member.phone}</div>
                     </TableCell>
-                    <TableCell className="max-w-48 whitespace-normal">{member.plan}</TableCell>
+                    <TableCell className="hidden max-w-48 whitespace-normal md:table-cell">{member.plan}</TableCell>
                     <TableCell className="min-w-48">
                       <div className="grid gap-1.5">
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -182,11 +209,11 @@ export default async function MembersPage({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div>{formatDate(member.endDate)}</div>
                       <div className="text-xs text-muted-foreground">{expiryHint(summary)}</div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusBadge status={summary.effectiveStatus} />
                     </TableCell>
                     <TableCell className="pr-4">
@@ -203,6 +230,41 @@ export default async function MembersPage({
           )}
         </CardContent>
       </Card>
+
+      {matching.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, matching.length)} of {matching.length}
+          </p>
+          <div className="flex items-center gap-1">
+            {page <= 1 ? (
+              <Button variant="outline" size="icon-sm" disabled aria-label="Previous page">
+                <ChevronLeftIcon />
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="icon-sm">
+                <Link href={pageHref(page - 1)} aria-label="Previous page">
+                  <ChevronLeftIcon />
+                </Link>
+              </Button>
+            )}
+            <span className="min-w-20 text-center text-sm text-muted-foreground">
+              Page {page} of {pageCount}
+            </span>
+            {page >= pageCount ? (
+              <Button variant="outline" size="icon-sm" disabled aria-label="Next page">
+                <ChevronRightIcon />
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="icon-sm">
+                <Link href={pageHref(page + 1)} aria-label="Next page">
+                  <ChevronRightIcon />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
